@@ -13,11 +13,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        TestGCDOperationOC.testOperation()
-        TestGCDOperationOC.testGCDGroup()
+        TestGCDOperationOC.testGCDGroupDependency()
+        TestGCDOperationOC.testOperationGroupDependency1()
+        TestGCDOperationOC.testOperationGroupDependency2()
+        TestGCDOperationOC.testOperationGroupDependency3()
         //-----------
-        TestGCDOperationSwift.testOperation()
-        TestGCDOperationSwift.testGCDGroup()
+        
+        TestGCDOperationSwift.testGCDGroupDependency()
+        TestGCDOperationSwift.testOperationGroupDependency1()
+        TestGCDOperationSwift.testOperationGroupDependency2()
+        TestGCDOperationSwift.testOperationGroupDependency3()
     }
     
 }
