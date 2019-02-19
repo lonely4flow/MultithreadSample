@@ -126,7 +126,7 @@ class TestGCDOperationSwift: NSObject {
            let temps:Int = Int(arc4random_uniform(3))+1
              let operation: BlockOperation = LFCutomeBlockOperationSwift()
             weak var weakOpe = operation
-            operation.addExecutionBlock {
+            operation.addExecutionBlock {                
                 print("###swift-cancle-aaa i:\(i)-wait:\(temps)-isCancle:\(String(describing: weakOpe?.isCancelled))")
                 if weakOpe?.isCancelled ?? false {
                     return

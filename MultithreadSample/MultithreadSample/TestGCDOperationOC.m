@@ -134,19 +134,20 @@
     // 需要循环遍历添加执行任务的场景
     for (int i=0;i<10;i++) {
         int temps = (arc4random() % 5) + 1;
-         __block NSOperation *op = [LFCustomBlockOperationOC blockOperationWithBlock:^{
-            NSLog(@"###oc-cancle-aaa %d %@ isCancelled:%@",i,op,op.isCancelled?@"true":@"false");
-            if (op.isCancelled){
+        NSBlockOperation *op = [LFCustomBlockOperationOC new];
+        __weak typeof(NSBlockOperation) *weakOp = op;
+        [op addExecutionBlock:^{
+            __strong typeof(NSBlockOperation) *strongOp = weakOp;
+            NSLog(@"###oc-cancle-aaa %d %@ isCancelled:%@",i,strongOp,strongOp.isCancelled?@"true":@"false");
+            if (strongOp.isCancelled){
                 return ;
             }
             [NSThread sleepForTimeInterval:temps];
-            NSLog(@"###oc-cancle-bbb %d %@ isCancelled:%@",i,op,op.isCancelled?@"true":@"false");
-            if (op.isCancelled){
-                op = nil;
+            NSLog(@"###oc-cancle-bbb %d %@ isCancelled:%@",i,strongOp,strongOp.isCancelled?@"true":@"false");
+            if (strongOp.isCancelled){
                 return ;
             }
             NSLog(@"###oc-cancle-ccc i:%d-wait:%d-thread:%@",i,temps,NSThread.currentThread);
-             op = nil;
         }];
         [ops addObject:op];
     }
