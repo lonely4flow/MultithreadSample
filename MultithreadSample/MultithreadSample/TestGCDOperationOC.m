@@ -135,9 +135,9 @@
     for (int i=0;i<10;i++) {
         int temps = (arc4random() % 5) + 1;
         NSBlockOperation *op = [LFCustomBlockOperationOC new];
-        __weak typeof(NSBlockOperation) *weakOp = op;
+        __weak typeof(op) weakOp = op;
         [op addExecutionBlock:^{
-            __strong typeof(NSBlockOperation) *strongOp = weakOp;
+            __strong typeof(weakOp) strongOp = weakOp;
             NSLog(@"###oc-cancle-aaa %d %@ isCancelled:%@",i,strongOp,strongOp.isCancelled?@"true":@"false");
             if (strongOp.isCancelled){
                 return ;
