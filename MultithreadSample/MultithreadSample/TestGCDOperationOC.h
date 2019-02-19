@@ -13,4 +13,5 @@
 + (void) testOperationGroupDependency1;
 + (void) testOperationGroupDependency2;
 + (void) testOperationGroupDependency3;
++ (void) testOperationCancleOperationBlock;
 @end

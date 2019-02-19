@@ -7,7 +7,7 @@
 //
 
 #import "TestGCDOperationOC.h"
-
+#import "LFCustomBlockOperationOC.h"
 @implementation TestGCDOperationOC
 + (void) testGCDGroupDependency
 {
@@ -125,6 +125,52 @@
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     // 添加到任务队列中执行
     [queue addOperations:@[op0,op1,op2] waitUntilFinished:false];
+}
++ (void) testOperationCancleOperationBlock
+{
+    // 打印当前线程
+    //NSLog(@"###oc-operation1-begin-currentThread---%@",[NSThread currentThread]);
+    NSMutableArray *ops = [NSMutableArray array];
+    // 需要循环遍历添加执行任务的场景
+    for (int i=0;i<10;i++) {
+        int temps = (arc4random() % 5) + 1;
+         __block NSOperation *op = [LFCustomBlockOperationOC blockOperationWithBlock:^{
+            NSLog(@"###oc-cancle-aaa %d %@ isCancelled:%@",i,op,op.isCancelled?@"true":@"false");
+            if (op.isCancelled){
+                return ;
+            }
+            [NSThread sleepForTimeInterval:temps];
+            NSLog(@"###oc-cancle-bbb %d %@ isCancelled:%@",i,op,op.isCancelled?@"true":@"false");
+            if (op.isCancelled){
+                op = nil;
+                return ;
+            }
+            NSLog(@"###oc-cancle-ccc i:%d-wait:%d-thread:%@",i,temps,NSThread.currentThread);
+             op = nil;
+        }];
+        [ops addObject:op];
+    }
+    // 不是遍历添加的需要单独添加的任务
+    TestGCDOperationOC *target = [TestGCDOperationOC new];
+    NSOperation *op1 = [[NSInvocationOperation alloc] initWithTarget:target selector:@selector(hello:) object:@"1"];
+    [ops addObject:op1];
+    // 其他Operation都执行完后再执行的Operation
+    NSOperation *op2 = [NSBlockOperation blockOperationWithBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"###oc-cancle- ++++++thread:%@",NSThread.currentThread);
+        });
+    }];
+    // 最后执行的任务对其他所有任务都添加依赖
+    for (NSOperation *op in ops) {
+        [op2 addDependency:op];
+    }
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [ops addObject:op2];
+    // 添加到任务队列中执行
+    [queue addOperations:ops waitUntilFinished:false];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [queue cancelAllOperations];
+    });
 }
 - (void)hello:(NSString *)world
 {

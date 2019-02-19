@@ -17,12 +17,14 @@ class ViewController: UIViewController {
         TestGCDOperationOC.testOperationGroupDependency1()
         TestGCDOperationOC.testOperationGroupDependency2()
         TestGCDOperationOC.testOperationGroupDependency3()
-        //-----------
-        
+        TestGCDOperationOC.testOperationCancleOperationBlock()
+//        //-----------
+
         TestGCDOperationSwift.testGCDGroupDependency()
         TestGCDOperationSwift.testOperationGroupDependency1()
         TestGCDOperationSwift.testOperationGroupDependency2()
         TestGCDOperationSwift.testOperationGroupDependency3()
+        TestGCDOperationSwift.testOperationCancleOperationBlock()
     }
     
 }

@@ -118,4 +118,50 @@ class TestGCDOperationSwift: NSObject {
         let queue = OperationQueue()
         queue.addOperations([op0,op1,op2], waitUntilFinished: false)
     }
+    class func testOperationCancleOperationBlock() -> Void
+    {
+        var ops: [Operation] = []
+        // 需要循环遍历添加执行任务的场景
+        for i in 0..<10 {
+           let temps:Int = Int(arc4random_uniform(3))+1
+             let operation: BlockOperation = LFCutomeBlockOperationSwift()
+            weak var weakOpe = operation
+            operation.addExecutionBlock {
+                print("###swift-cancle-aaa i:\(i)-wait:\(temps)-isCancle:\(String(describing: weakOpe?.isCancelled))")
+                if weakOpe?.isCancelled ?? false {
+                    return
+                }
+                sleep(UInt32(temps))
+                print("###swift-cancle-bbbx i:\(i)-wait:\(temps)-isCancle:\(String(describing: weakOpe?.isCancelled))")
+                if weakOpe?.isCancelled ?? false {
+                    print("###swift-cancle-bbby i:\(i)-wait:\(temps)-isCancle:\(String(describing: weakOpe?.isCancelled))")
+                    return
+                }
+                print("###swift-cancle-ccc i:\(i)-wait:\(temps)-thread:\(Thread.current)")
+            }
+            ops.append(operation)
+        }
+        // 不是遍历添加的需要单独添加的任务
+        let op1 = BlockOperation {
+            print("###swift-cancle -------\(Thread.current)")
+        }
+        ops.append(op1)
+        let op2 = BlockOperation {
+            DispatchQueue.main.async {
+                print("###swift-cancle +++++-\(Thread.current)")
+            }
+            
+        }
+        // 最后执行的任务对其他所有任务都添加依赖
+        for op in ops {
+            op2.addDependency(op)
+        }
+        ops.append(op2)
+        let queue = OperationQueue()
+        // 添加到任务队列中执行
+        queue.addOperations(ops, waitUntilFinished: false)
+        DispatchQueue.global().asyncAfter(deadline: .now()+2) {
+            queue.cancelAllOperations()
+        }
+    }
 }
